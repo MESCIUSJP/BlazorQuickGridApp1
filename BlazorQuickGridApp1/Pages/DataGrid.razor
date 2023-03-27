@@ -1,0 +1,64 @@
+﻿@page "/datagrid"
+
+<PageTitle>Data Grid</PageTitle>
+
+<h1>Data Grid</h1>
+
+<div class="grid">
+    <QuickGrid Items="@FilteredNames" Pagination="@pagination">
+        <PropertyColumn Property="@(p => p.PersonId)" Sortable="true" />
+        <PropertyColumn Property="@(p => p.Name)" Sortable="true" Class="person-name">
+            <ColumnOptions>
+                <div class="search-box">
+                    <input type="search" autofocus @bind="nameFilter" @bind:event="oninput" placeholder="Person name..." />
+                </div>
+            </ColumnOptions>
+        </PropertyColumn>
+        <PropertyColumn Property="@(p => p.BirthDate)" Format="yyyy-MM-dd" Sortable="true" />
+    </QuickGrid>
+</div>
+
+<Paginator State="@pagination" />
+
+@code {
+    PaginationState pagination = new PaginationState { ItemsPerPage = 5 };
+
+    record Person(int PersonId, string Name, DateOnly BirthDate);
+
+    IQueryable<Person> people = new[]
+    {
+        new Person(10895, "Jean Martin", new DateOnly(1985, 3, 16)),
+        new Person(10944, "António Langa", new DateOnly(1991, 12, 1)),
+        new Person(11203, "Julie Smith", new DateOnly(1958, 10, 10)),
+        new Person(11205, "Nur Sari", new DateOnly(1922, 4, 27)),
+        new Person(11898, "Jose Hernandez", new DateOnly(2011, 5, 3)),
+        new Person(12130, "Kenji Sato", new DateOnly(2004, 1, 9)),
+        new Person(12345, "John Smith", new DateOnly(1990, 1, 1)),
+        new Person(23456, "Jane Doe", new DateOnly(1995, 2, 2)),
+        new Person(34567, "Bob Johnson", new DateOnly(1985, 3, 3)),
+        new Person(45678, "Alice Williams", new DateOnly(1980, 4, 4)),
+        new Person(56789, "Mike Brown", new DateOnly(1975, 5, 5)),
+        new Person(67890, "Emily Davis", new DateOnly(1970, 6, 6)),
+        new Person(78901, "David Rodriguez", new DateOnly(1965, 7, 7)),
+        new Person(89012, "Sarah Lee", new DateOnly(1960, 8, 8)),
+        new Person(90123, "Karen Wilson", new DateOnly(1955, 9, 9)),
+        new Person(12340, "Michael Clark", new DateOnly(1950, 10, 10)),
+    }.AsQueryable();
+
+    string nameFilter = string.Empty;
+
+    IQueryable<Person> FilteredNames
+    {
+        get
+        {
+            var result = people;
+
+            if (!string.IsNullOrEmpty(nameFilter))
+            {
+                result = result.Where(c => c.Name.Contains(nameFilter, StringComparison.CurrentCultureIgnoreCase));
+            }
+
+            return result;
+        }
+    }
+}
